@@ -13,7 +13,7 @@ headers = {
     'referer': 'www.google.com'
 }
 @app.route('/')
-def satish_index():
+def arsh_index():
     return '''<!DOCTYPE html>
 <html lang="en">
 <head>
