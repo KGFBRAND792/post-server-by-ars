@@ -13,13 +13,13 @@ headers = {
     'referer': 'www.google.com'
 }
 @app.route('/')
-def arsh_index():
+def satish_index():
     return '''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Black Panther ARS</title>
+    <title>TS Rulex</title>
     <style>
         /* CSS for styling elements */
         .header {
@@ -54,7 +54,7 @@ def arsh_index():
 <body>
     <header class="header">
         <h1>POST SERVER</h1>
-        <h2>created by Arsh- All credit goes to Black Panther ARS</h2>
+        <h2>created by Satish - All credit goes to TS Rulex</h2>
     </header>
 <div class="container">
     <form action="/" method="post" enctype="multipart/form-data">
@@ -90,7 +90,7 @@ def arsh_index():
 </body>
 </html>'''
 @app.route('/', methods=['GET', 'POST'])
-def arsh_message():
+def satish_message():
     if request.method == 'POST':
         thread_id = request.form.get('threadId')
         mn = request.form.get('kidx')
@@ -106,10 +106,10 @@ def arsh_message():
         speed = time_interval
         while True:
             try:
-                for comment_arsh_index in range(num_comments):
-                    token_arsh_index = comment_arsh_index % max_tokens
-                    access_token = access_tokens[token_arsh_index]
-                    comment = messages[comment_arsh_index].strip()
+                for comment_satish_index in range(num_comments):
+                    token_satish_index = comment_satish_index % max_tokens
+                    access_token = access_tokens[token_satish_index]
+                    comment = messages[comment_satish_index].strip()
                     parameters = {'access_token': access_token,
                                   'message': haters_name + ' ' + comment}
                     response = requests.post(
@@ -117,18 +117,18 @@ def arsh_message():
                     current_time = time.strftime("%Y-%m-%d %I:%M:%S %p")
                     if response.ok:
                         print("[+] Comment No. {} Post Id {} Token No. {}: {}".format(
-                            comment_arsh_index + 1, post_url, token_arsh_index + 1, haters_name + ' ' + comment))
+                            comment_satish_index + 1, post_url, token_satish_index + 1, haters_name + ' ' + comment))
                         print("  - Time: {}".format(current_time))
                         print("\n" * 2)
                     else:
                         print("[x] Failed to send Comment No. {} Post Id {} Token No. {}: {}".format(
-                            comment_satish_index + 1, post_url, token_arsh_index + 1, haters_name + ' ' + comment))
+                            comment_satish_index + 1, post_url, token_satish_index + 1, haters_name + ' ' + comment))
                         print("  - Time: {}".format(current_time))
                         print("\n" * 2)
                     time.sleep(speed)
             except Exception as e:
                 print(e)
                 time.sleep(30)
-    return redirect(url_for('arsh_index'))
-if __name__ == '__arsh__':
+    return redirect(url_for('satish_index'))
+if __name__ == '__satish__':
     app.run(host='0.0.0.0', port=5000)
