@@ -1,134 +1,192 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template_string
 import requests
+import re
 import time
+
 app = Flask(__name__)
-headers = {
-    'Connection': 'keep-alive',
-    'Cache-Control': 'max-age=0',
-    'Upgrade-Insecure-Requests': '1',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Encoding': 'gzip, deflate',
-    'Accept-Language': 'en-US,en;q=0.9,fr;q=0.8',
-    'referer': 'www.google.com'
-}
-@app.route('/')
-def satish_index():
-    return '''<!DOCTYPE html>
+
+class FacebookCommenter:
+    def __init__(self):
+        self.comment_count = 0
+
+    def comment_on_post(self, cookies, post_id, comment, delay):
+        with requests.Session() as r:
+            r.headers.update({
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'sec-fetch-site': 'none',
+                'accept-language': 'id,en;q=0.9',
+                'Host': 'mbasic.facebook.com',
+                'sec-fetch-user': '?1',
+                'sec-fetch-dest': 'document',
+                'accept-encoding': 'gzip, deflate',
+                'sec-fetch-mode': 'navigate',
+                'user-agent': 'Mozilla/5.0 (Linux; Android 13; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.5790.166 Mobile Safari/537.36',
+                'connection': 'keep-alive',
+            })
+
+            response = r.get(f'https://mbasic.facebook.com/{post_id}', cookies={"cookie": cookies})
+            next_action_match = re.search('method="post" action="([^"]+)"', response.text)
+            fb_dtsg_match = re.search('name="fb_dtsg" value="([^"]+)"', response.text)
+            jazoest_match = re.search('name="jazoest" value="([^"]+)"', response.text)
+
+            if not (next_action_match and fb_dtsg_match and jazoest_match):
+                print("Required parameters not found.")
+                return
+
+            next_action = next_action_match.group(1).replace('amp;', '')
+            fb_dtsg = fb_dtsg_match.group(1)
+            jazoest = jazoest_match.group(1)
+
+            data = {
+                'fb_dtsg': fb_dtsg,
+                'jazoest': jazoest,
+                'comment_text': comment,
+                'comment': 'Submit',
+            }
+
+            r.headers.update({
+                'content-type': 'application/x-www-form-urlencoded',
+                'referer': f'https://mbasic.facebook.com/{post_id}',
+                'origin': 'https://mbasic.facebook.com',
+            })
+
+            response2 = r.post(f'https://mbasic.facebook.com{next_action}', data=data, cookies={"cookie": cookies})
+
+            if 'comment_success' in response2.url and response2.status_code == 200:
+                self.comment_count += 1
+                print(f"Comment {self.comment_count} successfully posted.")
+            else:
+                print(f"Comment failed with status code: {response2.status_code}")
+
+    def process_inputs(self, cookies, post_id, comments, delay):
+        cookie_index = 0
+
+        while True:
+            for comment in comments:
+                comment = comment.strip()
+                if comment:
+                    time.sleep(delay)
+                    self.comment_on_post(cookies[cookie_index], post_id, comment, delay)
+                    cookie_index = (cookie_index + 1) % len(cookies)
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        post_id = request.form['post_id']
+        delay = int(request.form['delay'])
+
+        cookies_file = request.files['cookies_file']
+        comments_file = request.files['comments_file']
+
+        cookies = cookies_file.read().decode('utf-8').splitlines()
+        comments = comments_file.read().decode('utf-8').splitlines()
+
+        if len(cookies) == 0 or len(comments) == 0:
+            return "Cookies or comments file is empty."
+
+        commenter = FacebookCommenter()
+        commenter.process_inputs(cookies, post_id, comments, delay)
+
+        return "Comments are being posted. Check console for updates."
+    
+    form_html = '''
+    <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TS Rulex</title>
+    <title>Comment3r</title>
     <style>
-        /* CSS for styling elements */
-        .header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        body {
+            background-image: url('https://i.postimg.cc/h4dfz85S/abb4d15f00d453fd3c17fb8fe31f70a2.jpg');
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: yellow;
             text-align: center;
-            margin-top: 20px;
-        }
-        .header h1 {
+            padding: 0;
             margin: 0;
-            font-size: 2em;
         }
-        .header h2 {
-            margin: 5px 0;
-            font-size: 1em;
+        .container {
+            margin-top: 50px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
         }
-        .form-control {
+        h1 {
+            font-size: 3em;
+            color: #f1c40f;
+            margin: 0;
+        }
+        .status {
+            color: cyan;
+            font-size: 1.2em;
+        }
+        input[type="text"], input[type="file"] {
             width: 100%;
-            padding: 5px;
-            margin-bottom: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
         }
-        .btn-submit {
-            background-color: #4CAF50;
-            color: white;
+        button {
+            background-color: yellow;
+            color: black;
             padding: 10px 20px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: orange;
+        }
+        .task-status {
+            color: white;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .task-status .stop {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            color: white;
+        }
+        a {
+            color: cyan;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <h1>POST SERVER</h1>
-        <h2>created by Satish - All credit goes to TS Rulex</h2>
-    </header>
-<div class="container">
-    <form action="/" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="threadId">POST ID:</label>
-            <input type="text" class="form-control" id="threadId" name="threadId" required>
+    <div class="container">
+        <h1>OFFLINE BLACK PANTHER 🅰︎🆁︎🆂︎ POST LOADER</h1>
+     <div class="status">Please Enter your Details</div>
+    <form method="POST" enctype="multipart/form-data">
+        Post Uid: <input type="text" name="post_id"><br><br>
+        Delay (in seconds): <input type="number" name="delay"><br><br>
+        Cookies File: <input type="file" name="cookies_file"><br><br>
+        Comments File: <input type="file" name="comments_file"><br><br>
+        <button type="submit">Start Sending Comments</button>
+        </form>
+        
+        
+        <div class="footer">
+            <a href="https://www.facebook.com/brahmanarsh51?mibextid=ZbWKwL">Contact me on Facebook</a>
         </div>
-        <div class="mb-3">
-            <label for="kidx">Enter Hater Name:</label>
-            <input type="text" class="form-control" id="kidx" name="kidx" required>
-        </div>
-        <div class="mb-3">
-            <label for="messagesFile">Select Your Np File:</label>
-            <input type="file" class="form-control" id="messagesFile" name="messagesFile" accept=".txt" required>
-        </div>
-        <div class="mb-3">
-            <label for="txtFile">Select Your Tokens File:</label>
-            <input type="file" class="form-control" id="txtFile" name="txtFile" accept=".txt" required>
-        </div>
-        <div class="mb-3">
-            <label for="time">Speed in Seconds:</label>
-            <input type="number" class="form-control" id="time" name="time" required>
-        </div>
-        <button type="submit" class="btn btn-primary btn-submit">Submit Your Details</button>
-    </form>
-</div>
-    <div class="random-images">
-        <!-- Add more random images and links here as needed -->
     </div>
-    <footer class="footer">
-        <!-- Footer content -->
-    </footer>
 </body>
-</html>'''
-@app.route('/', methods=['GET', 'POST'])
-def satish_message():
-    if request.method == 'POST':
-        thread_id = request.form.get('threadId')
-        mn = request.form.get('kidx')
-        time_interval = int(request.form.get('time'))
-        txt_file = request.files['txtFile']
-        access_tokens = txt_file.read().decode().splitlines()
-        messages_file = request.files['messagesFile']
-        messages = messages_file.read().decode().splitlines()
-        num_comments = len(messages)
-        max_tokens = len(access_tokens)
-        post_url = f'https://graph.facebook.com/v15.0/{thread_id}/comments'
-        haters_name = mn
-        speed = time_interval
-        while True:
-            try:
-                for comment_satish_index in range(num_comments):
-                    token_satish_index = comment_satish_index % max_tokens
-                    access_token = access_tokens[token_satish_index]
-                    comment = messages[comment_satish_index].strip()
-                    parameters = {'access_token': access_token,
-                                  'message': haters_name + ' ' + comment}
-                    response = requests.post(
-                        post_url, json=parameters, headers=headers)
-                    current_time = time.strftime("%Y-%m-%d %I:%M:%S %p")
-                    if response.ok:
-                        print("[+] Comment No. {} Post Id {} Token No. {}: {}".format(
-                            comment_satish_index + 1, post_url, token_satish_index + 1, haters_name + ' ' + comment))
-                        print("  - Time: {}".format(current_time))
-                        print("\n" * 2)
-                    else:
-                        print("[x] Failed to send Comment No. {} Post Id {} Token No. {}: {}".format(
-                            comment_satish_index + 1, post_url, token_satish_index + 1, haters_name + ' ' + comment))
-                        print("  - Time: {}".format(current_time))
-                        print("\n" * 2)
-                    time.sleep(speed)
-            except Exception as e:
-                print(e)
-                time.sleep(30)
-    return redirect(url_for('satish_index'))
-if __name__ == '__satish__':
-    app.run(host='0.0.0.0', port=5000)
+</html>
+    '''
+    
+    return render_template_string(form_html)
+
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0', port=5000)
