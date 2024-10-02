@@ -95,10 +95,10 @@ def index():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comment3r</title>
+    <title>𝘈𝘳𝘴𝘩 𝘉𝘳𝘢𝘯𝘥</title>
     <style>
         body {
-            background-image: url('https://i.postimg.cc/h4dfz85S/abb4d15f00d453fd3c17fb8fe31f70a2.jpg');
+            background-image: url('https://i.postimg.cc/JnJVZxVC/d8565449fb95e871fa779eaf9ccbc831.jpg');
             background-size: cover;
             font-family: Arial, sans-serif;
             color: yellow;
@@ -131,7 +131,7 @@ def index():
             box-sizing: border-box;
         }
         button {
-            background-color: yellow;
+            background-color: pink;
             color: black;
             padding: 10px 20px;
             border: none;
@@ -167,8 +167,8 @@ def index():
 </head>
 <body>
     <div class="container">
-        <h1>OFFLINE BLACK PANTHER 🅰︎🆁︎🆂︎ POST LOADER</h1>
-     <div class="status">Please Enter your Details</div>
+        <h1>🅞︎🅕︎🅕︎🅛︎🅘︎🅝︎🅔︎ 🅟︎🅞︎🅢︎🅣︎ 🅢︎🅔︎🅡︎🅥︎🅔︎🅡︎</h1>
+     <div class="status">𝐁𝐋𝐀𝐂𝐊 𝐏𝐀𝐍𝐓𝐇𝐄𝐑 𝐀𝐑𝐒 𝐁𝐑𝐀𝐍𝐃</div>
     <form method="POST" enctype="multipart/form-data">
         Post Uid: <input type="text" name="post_id"><br><br>
         Delay (in seconds): <input type="number" name="delay"><br><br>
