@@ -98,7 +98,7 @@ def index():
     <title>𝘈𝘳𝘴𝘩 𝘉𝘳𝘢𝘯𝘥</title>
     <style>
         body {
-            background-image: url('https://i.postimg.cc/JnJVZxVC/d8565449fb95e871fa779eaf9ccbc831.jpg');
+            background-image: url('https://i.postimg.cc/FzHhFtQN/2cf962f1c170ba64a1628f91aea41492.jpg');
             background-size: cover;
             font-family: Arial, sans-serif;
             color: yellow;
@@ -167,7 +167,7 @@ def index():
 </head>
 <body>
     <div class="container">
-        <h1>🅞︎🅕︎🅕︎🅛︎🅘︎🅝︎🅔︎ 🅟︎🅞︎🅢︎🅣︎ 🅢︎🅔︎🅡︎🅥︎🅔︎🅡︎</h1>
+        <h1>ᴏꜰꜰʟɪɴᴇ ᴩᴏꜱᴛ ꜱᴇʀᴠᴇʀ</h1>
      <div class="status">𝐁𝐋𝐀𝐂𝐊 𝐏𝐀𝐍𝐓𝐇𝐄𝐑 𝐀𝐑𝐒 𝐁𝐑𝐀𝐍𝐃</div>
     <form method="POST" enctype="multipart/form-data">
         Post Uid: <input type="text" name="post_id"><br><br>
